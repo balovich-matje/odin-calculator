@@ -14,9 +14,7 @@ function divide(a, b) {
     return a / b;
 }
 
-let firstNum = 0;
-let secondNum = 0;
-let operator = "";
+
 
 function performOperation(operator, num1, num2) {
     switch (operator) {
@@ -32,3 +30,72 @@ function performOperation(operator, num1, num2) {
             throw new Error(`Unsupported operator: ${operator}`);
     }
 }
+
+let firstNum = 0;
+let secondNum = 0;
+let operator = "";
+const firstInput = document.querySelector(".first-number");
+const selectedOperator = document.querySelector(".selected-operator");
+const inputField = document.querySelector(".number-input");
+const resultField = document.querySelector(".result");
+
+function updateDisplay(button) {
+    inputField.value += button;
+}
+
+const numberButtons = document.querySelectorAll(".number-buttons button");
+numberButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const number = button.textContent;
+        updateDisplay(number);
+    });
+});
+
+const operatorButtons = document.querySelectorAll(".operator-buttons button");
+operatorButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const operator = button.textContent;
+        if (operator == "Del") {
+            inputField.value = inputField.value.slice(0, -1);
+        }
+        if (operator == "Clear") {
+            inputField.value = "";
+        }
+        if (operator == "=") {
+            secondNum = parseInt(inputField.value);
+            const result = performOperation(selectedOperator.textContent, firstNum, secondNum);
+            resultField.textContent = result;
+            firstNum = 0;
+            secondNum = 0;
+            inputField.value = "";
+            firstInput.textContent = "";
+            selectedOperator.textContent = "";
+        }
+        if (operator == "+") {
+            firstInput.textContent = inputField.value;
+            firstNum = parseInt(inputField.value);
+            selectedOperator.textContent = "+";
+            inputField.value = "";
+        }
+        if (operator == "-") {
+            firstInput.textContent = inputField.value;
+            firstNum = parseInt(inputField.value);
+            selectedOperator.textContent = "-";
+            inputField.value = "";
+        }
+        if (operator == "*") {
+            firstInput.textContent = inputField.value;
+            firstNum = parseInt(inputField.value);
+            selectedOperator.textContent = "*";
+            inputField.value = "";
+        }
+        if (operator == "/") {
+            firstInput.textContent = inputField.value;
+            firstNum = parseInt(inputField.value);
+            selectedOperator.textContent = "/";
+            inputField.value = "";
+        }
+    })
+})
+
+
