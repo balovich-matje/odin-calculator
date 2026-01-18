@@ -10,6 +10,9 @@ function performOperation(operator, num1, num2) {
     if (!(operator in operations)) {
         throw new Error(`Unsupported operator: ${operator}`);
     }
+    if (operator === "/" && num2 === 0) {
+        return "BOOM! Divided by zero";
+    }
     return operations[operator](num1, num2);
 }
 
