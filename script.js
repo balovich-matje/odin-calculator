@@ -129,3 +129,61 @@ document.querySelectorAll(".number-buttons button").forEach(button => {
 document.querySelectorAll(".operator-buttons button").forEach(button => {
     button.addEventListener("click", (e) => handleOperatorClick(e.target.textContent));
 });
+
+// Keyboard support
+document.addEventListener("keydown", (e) => {
+    const key = e.key;
+
+    // Number keys (0-9)
+    if (key >= "0" && key <= "9") {
+        const button = document.createElement("button");
+        button.textContent = key;
+        handleNumberClick(button);
+        return;
+    }
+
+    // Decimal point
+    if (key === ".") {
+        const button = document.createElement("button");
+        button.textContent = ".";
+        handleNumberClick(button);
+        return;
+    }
+
+    // Operators
+    if (key === "+" || key === "-" || key === "*" || key === "/") {
+        handleOperatorClick(key);
+        e.preventDefault();
+        return;
+    }
+
+    // Equals
+    if (key === "Enter" || key === "=") {
+        handleOperatorClick("=");
+        e.preventDefault();
+        return;
+    }
+
+    // Delete (backspace)
+    if (key === "Backspace") {
+        handleOperatorClick("Del");
+        e.preventDefault();
+        return;
+    }
+
+    // Clear (Escape)
+    if (key === "Escape") {
+        handleOperatorClick("Clear");
+        e.preventDefault();
+        return;
+    }
+
+    // Toggle sign (+/-)
+    if (key === "+/-") {
+        const button = document.createElement("button");
+        button.textContent = "+/-";
+        handleNumberClick(button);
+        e.preventDefault();
+        return;
+    }
+});
