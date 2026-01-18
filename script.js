@@ -98,7 +98,8 @@ function handleOperatorClick(buttonValue) {
             state.secondNumber = inputValue;
             const result = performOperation(operator, firstNumber, state.secondNumber);
             updateDisplay(String(result));
-            state = { firstNumber: 0, secondNumber: 0, operator: "", newNumber: true };
+            console.log(state);
+            state = { firstNumber: result, secondNumber: 0, operator: "", newNumber: true };
             UI.operator.textContent = "";
             break;
 
