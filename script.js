@@ -1,101 +1,128 @@
-function add(a, b) {
-    return a + b;
-}
-
-function subtract(a, b) {
-    return a - b;
-}
-
-function multiply(a, b) {
-    return a * b;
-}
-
-function divide(a, b) {
-    return a / b;
-}
-
-
+// Basic arithmetic operations
+const operations = {
+    "+": (a, b) => a + b,
+    "-": (a, b) => a - b,
+    "*": (a, b) => a * b,
+    "/": (a, b) => a / b,
+};
 
 function performOperation(operator, num1, num2) {
-    switch (operator) {
-        case "+":
-            return add(num1, num2);
-        case "-":
-            return subtract(num1, num2);
-        case "*":
-            return multiply(num1, num2);
-        case "/":
-            return divide(num1, num2);
-        default:
-            throw new Error(`Unsupported operator: ${operator}`);
+    if (!(operator in operations)) {
+        throw new Error(`Unsupported operator: ${operator}`);
+    }
+    return operations[operator](num1, num2);
+}
+
+// DOM Elements
+const UI = {
+    operator: document.querySelector(".selected-operator"),
+    input: document.querySelector(".number-input"),
+};
+
+// Calculator state
+let state = {
+    firstNumber: 0,
+    secondNumber: 0,
+    operator: "",
+    newNumber: true,
+};
+
+// Update display
+function updateDisplay(value) {
+    UI.input.value = value;
+}
+
+// Clear all display fields
+function clearDisplay() {
+    updateDisplay("0");
+    UI.operator.textContent = "";
+    state = { firstNumber: 0, secondNumber: 0, operator: "", newNumber: true };
+}
+
+// Handle number button clicks
+function handleNumberClick(button) {
+    const value = button.textContent;
+    const currentValue = UI.input.value;
+
+    // Handle decimal point
+    if (value === ".") {
+        if (state.newNumber) {
+            updateDisplay("0.");
+            state.newNumber = false;
+        } else if (!currentValue.includes(".")) {
+            updateDisplay(currentValue + ".");
+        }
+        return;
+    }
+
+    // Handle positive/negative toggle
+    if (value === "+/-") {
+        const num = parseFloat(currentValue);
+        updateDisplay(String(-num));
+        return;
+    }
+
+    // Handle regular numbers
+    if (state.newNumber) {
+        updateDisplay(value);
+        state.newNumber = false;
+    } else {
+        updateDisplay(currentValue === "0" ? value : currentValue + value);
     }
 }
 
-let firstNum = 0;
-let secondNum = 0;
-let operator = "";
-const firstInput = document.querySelector(".first-number");
-const selectedOperator = document.querySelector(".selected-operator");
-const inputField = document.querySelector(".number-input");
-const resultField = document.querySelector(".result");
+// Handle operator button clicks
+function handleOperatorClick(buttonValue) {
+    const { firstNumber, operator } = state;
+    const inputValue = parseFloat(UI.input.value);
 
-function updateDisplay(button) {
-    inputField.value += button;
+    switch (buttonValue) {
+        case "Del":
+            const currentValue = UI.input.value;
+            if (currentValue.length > 1) {
+                updateDisplay(currentValue.slice(0, -1));
+            } else {
+                updateDisplay("0");
+            }
+            break;
+
+        case "Clear":
+            clearDisplay();
+            break;
+
+        case "=":
+            if (!operator || state.newNumber) return;
+            state.secondNumber = inputValue;
+            const result = performOperation(operator, firstNumber, state.secondNumber);
+            updateDisplay(String(result));
+            state = { firstNumber: 0, secondNumber: 0, operator: "", newNumber: true };
+            UI.operator.textContent = "";
+            break;
+
+        case "+":
+        case "-":
+        case "*":
+        case "/":
+            if (operator && !state.newNumber) {
+                state.secondNumber = inputValue;
+                state.firstNumber = performOperation(operator, firstNumber, state.secondNumber);
+                updateDisplay(String(state.firstNumber));
+            } else if (!state.newNumber) {
+                state.firstNumber = inputValue;
+            }
+
+            UI.operator.textContent = buttonValue;
+            state.operator = buttonValue;
+            state.newNumber = true;
+            break;
+    }
 }
 
-const numberButtons = document.querySelectorAll(".number-buttons button");
-numberButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        const number = button.textContent;
-        updateDisplay(number);
-    });
+// Event listeners
+document.querySelectorAll(".number-buttons button").forEach(button => {
+    button.addEventListener("click", () => handleNumberClick(button));
 });
 
-const operatorButtons = document.querySelectorAll(".operator-buttons button");
-operatorButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        const operator = button.textContent;
-        if (operator == "Del") {
-            inputField.value = inputField.value.slice(0, -1);
-        }
-        if (operator == "Clear") {
-            inputField.value = "";
-        }
-        if (operator == "=") {
-            secondNum = parseInt(inputField.value);
-            const result = performOperation(selectedOperator.textContent, firstNum, secondNum);
-            resultField.textContent = result;
-            firstNum = 0;
-            secondNum = 0;
-            inputField.value = "";
-            firstInput.textContent = "";
-            selectedOperator.textContent = "";
-        }
-        if (operator == "+") {
-            firstInput.textContent = inputField.value;
-            firstNum = parseInt(inputField.value);
-            selectedOperator.textContent = "+";
-            inputField.value = "";
-        }
-        if (operator == "-") {
-            firstInput.textContent = inputField.value;
-            firstNum = parseInt(inputField.value);
-            selectedOperator.textContent = "-";
-            inputField.value = "";
-        }
-        if (operator == "*") {
-            firstInput.textContent = inputField.value;
-            firstNum = parseInt(inputField.value);
-            selectedOperator.textContent = "*";
-            inputField.value = "";
-        }
-        if (operator == "/") {
-            firstInput.textContent = inputField.value;
-            firstNum = parseInt(inputField.value);
-            selectedOperator.textContent = "/";
-            inputField.value = "";
-        }
-    })
-})
-
-
+document.querySelectorAll(".operator-buttons button").forEach(button => {
+    button.addEventListener("click", (e) => handleOperatorClick(e.target.textContent));
+});
